@@ -15,7 +15,7 @@ Timer: Adding a timer to keep track of the time it takes the player to complete 
 
 Flagging Mines: Allowing players to flag tiles they suspect contain mines for strategic play.
 
-Choosing difficulty: Allowing players to choose number of mines and size of grid.
+Choosing Difficulty: Allowing players to choose number of mines and size of grid.
 
 # Stakeholders and Intended Users:
 ## Intended Users:
