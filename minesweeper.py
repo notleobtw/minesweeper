@@ -1,5 +1,30 @@
 import pygame as pg
 
+CELL_SIZE = 30
+ROWS = 10
+COLS = 10
+NUM_MINES = 5
+WIDTH = CELL_SIZE * ROWS
+HEIGHT = CELL_SIZE *COLS
+FPS = 60
+
+image_emptyGrid = pg.image.load("Sprites/empty.png")
+image_flag = pg.image.load("Sprites/flag.png")
+image_grid = pg.image.load("Sprites/Grid.png")
+image_grid1 = pg.image.load("Sprites/grid1.png")
+image_grid2 = pg.image.load("Sprites/grid2.png")
+image_grid3 = pg.image.load("Sprites/grid3.png")
+image_grid4 = pg.image.load("Sprites/grid4.png")
+image_grid5 = pg.image.load("Sprites/grid5.png")
+image_grid6 = pg.image.load("Sprites/grid6.png")
+image_grid7 = pg.image.load("Sprites/grid7.png")
+image_grid8 = pg.image.load("Sprites/grid8.png")
+image_grid7 = pg.image.load("Sprites/grid7.png")
+image_mine = pg.image.load("Sprites/mine.png")
+image_mineClicked = pg.image.load("Sprites/mineClicked.png")
+image_mineFalse = pg.image.load("Sprites/mineFalse.png")
+
+
 class Game:
     '''The main game class'''
     def __init__(self) -> None:
