@@ -29,7 +29,9 @@ class Game:
     '''The main game class'''
 
     def __init__(self) -> None:
-        pass
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        pg.display.set_caption("Leo's Minesweeper")
+        self.clock = pg.time.Clock()
 
     def set_difficulty(self, difficulty : str):
         '''Set the game difficulty
@@ -60,15 +62,20 @@ class Game:
 
     def new_game(self):
         '''Generate a new game from the start'''
-        pass
+        self.board = Board()
 
     def run_game(self):
         '''Run the game'''
-        pass
+        self.playing = True
+        while self.playing:
+            self.clock.tick(FPS)
+            self.draw()
 
     def draw(self):
         '''Display the game'''
-        pass
+        self.screen.fill('grey')
+        self.board.draw(self.screen)
+        pg.display.flip()
 
     def close_game(self):
         '''Closes the game'''
@@ -89,7 +96,7 @@ class Cell:
         self.state = state
         self.image = image
 
-    def draw(self, board : Board):
+    def draw(self, board):
         '''Display the cell on the board
         
         Args:
@@ -109,7 +116,7 @@ class Board:
     '''A board that contains many cells'''
 
     def __init__(self):
-        self.board = pg.Surface(WIDTH, HEIGHT)
+        self.board = pg.Surface((WIDTH, HEIGHT))
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
 
     def draw(self, window):
