@@ -54,6 +54,11 @@ class Game:
         '''Closes the game'''
         pass
 
+# State for a cell:
+#     '.': unknown
+#     'X': mine
+#     'N': a number (empty is 0)
+
 class Cell:
     '''One cell in the grid'''
     def __init__(self, pos_X, pos_Y, state, image, revealed=False, flagged=False):
@@ -67,3 +72,10 @@ class Cell:
     def draw(self, board):
         '''Display the cell on the board'''
         pass
+
+class Board:
+    '''A board that contains many cells'''
+
+    def __init__(self):
+        self.board = pg.Surface(WIDTH, HEIGHT)
+        self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
