@@ -36,7 +36,18 @@ class Game:
         Args:
             difficulty: the game difficulty
         '''
-        pass
+        if difficulty == 'beginner':
+            ROWS = 9
+            COLS = 9
+            NUM_MINES = 10
+        elif difficulty == 'intermediate':
+            ROWS = 16
+            COLS = 16
+            NUM_MINES = 40
+        elif difficulty == 'expert':
+            ROWS = 30
+            COLS = 16
+            NUM_MINES = 99
 
     def new_game(self):
         '''Generate a new game from the start'''
