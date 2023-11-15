@@ -20,8 +20,9 @@ image_grid5 = pg.image.load("Sprites/grid5.png")
 image_grid6 = pg.image.load("Sprites/grid6.png")
 image_grid7 = pg.image.load("Sprites/grid7.png")
 image_grid8 = pg.image.load("Sprites/grid8.png")
-image_grid7 = pg.image.load("Sprites/grid7.png")
 image_mine = pg.image.load("Sprites/mine.png")
+
+image_grid_number = [image_emptyGrid, image_grid1, image_grid2, image_grid3, image_grid4, image_grid5, image_grid6, image_grid7, image_grid8]
 image_mineClicked = pg.image.load("Sprites/mineClicked.png")
 image_mineFalse = pg.image.load("Sprites/mineFalse.png")
 
@@ -128,6 +129,7 @@ class Board:
         self.board = pg.Surface((WIDTH, HEIGHT))
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
         self.place_mines()
+        self.place_clue()
 
     def place_mines(self):
         '''Place mines in the board'''
@@ -139,6 +141,36 @@ class Board:
                     self.list_of_cells[x][y].image = image_mine
                     self.list_of_cells[x][y].state = "X"
                     break
+
+    def place_clue(self):
+        '''Place clues or the number surrounding mines in the board'''
+        for x in range(ROWS):
+            for y in range(COLS):
+                if self.list_of_cells[x][y].state != "X":
+                    nearby_mines = self.get_num_nearby_mines(x, y)
+                    if nearby_mines > 0:
+                        self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
+                        self.list_of_cells[x][y].state = "N"
+
+
+    def get_num_nearby_mines(self, x : int, y : int) -> int:
+        '''Count how many mines are neighbor with this cell
+        
+        Args:
+            x: the row of the cell
+            y: the col of the cell
+
+        Returns:
+            nearby_mines: the number of nearby mines
+        '''
+        nearby_mines = 0
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                neighbour_x = x + i
+                neighbour_y = y + j
+                if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS and self.list_of_cells[neighbour_x][neighbour_y].state == 'X':
+                    nearby_mines += 1
+        return nearby_mines
 
     def draw(self, window):
         '''Display the board to the game's window
