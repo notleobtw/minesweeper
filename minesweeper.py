@@ -91,7 +91,15 @@ class Cell:
 
     def draw(self, board):
         '''Display the cell on the board'''
-        pass
+        # Revealed cell
+        if self.revealed:
+            board.blit(self.image, (self.x, self.y))
+        # Flagged cell
+        elif self.flagged and not self.revealed:
+            board.blit(image_flag, (self.x, self.y))
+        # Unrevealed cell
+        elif not self.revealed:
+            board.blit(image_grid, (self.x, self.y))
 
 class Board:
     '''A board that contains many cells'''
