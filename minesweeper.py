@@ -53,3 +53,17 @@ class Game:
     def close_game(self):
         '''Closes the game'''
         pass
+
+class Cell:
+    '''One cell in the grid'''
+    def __init__(self, pos_X, pos_Y, state, image, revealed=False, flagged=False):
+        self.x = pos_X * CELL_SIZE
+        self.y = pos_Y * CELL_SIZE
+        self.revealed = revealed
+        self.flagged = flagged
+        self.state = state
+        self.image = image
+
+    def draw(self, board):
+        '''Display the cell on the board'''
+        pass
