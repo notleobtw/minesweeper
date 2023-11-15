@@ -1,6 +1,6 @@
 import pygame as pg
 
-CELL_SIZE = 30
+CELL_SIZE = 32
 ROWS = 9
 COLS = 9
 NUM_MINES = 10
@@ -29,7 +29,6 @@ class Game:
     '''The main game class'''
 
     def __init__(self) -> None:
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption("Leo's Minesweeper")
         self.clock = pg.time.Clock()
 
@@ -60,8 +59,10 @@ class Game:
             WIDTH = CELL_SIZE * ROWS
             HEIGHT = CELL_SIZE *COLS
 
-    def new_game(self):
+    def new_game(self, difficulty : str):
         '''Generate a new game from the start'''
+        self.set_difficulty(difficulty)
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.board = Board()
 
     def run_game(self):
@@ -90,6 +91,7 @@ class Game:
 #     'X': mine
 #     'N': a number (empty is 0)
 
+
 class Cell:
     '''One cell in the grid'''
     def __init__(self, pos_X, pos_Y, state, image, revealed=False, flagged=False):
@@ -116,6 +118,7 @@ class Cell:
         elif not self.revealed:
             board.blit(image_grid, (self.x, self.y))
 
+
 class Board:
     '''A board that contains many cells'''
 
@@ -133,6 +136,7 @@ class Board:
             for cell in row:
                 cell.draw(self.board)
         window.blit(self.board, (0, 0))
+
 
 if __name__ == '__main__':
     game = Game()
@@ -155,5 +159,5 @@ if __name__ == '__main__':
         print("FAILED!")
     
     while True:
-        game.new_game()
+        game.new_game('expert')
         game.run_game()
