@@ -1,11 +1,6 @@
 import pygame as pg
 
 CELL_SIZE = 30
-ROWS = 10
-COLS = 10
-NUM_MINES = 5
-WIDTH = CELL_SIZE * ROWS
-HEIGHT = CELL_SIZE *COLS
 FPS = 60
 
 image_emptyGrid = pg.image.load("Sprites/empty.png")
@@ -27,6 +22,12 @@ image_mineFalse = pg.image.load("Sprites/mineFalse.png")
 
 class Game:
     '''The main game class'''
+    ROWS = 9
+    COLS = 9
+    NUM_MINES = 10
+    WIDTH = CELL_SIZE * ROWS
+    HEIGHT = CELL_SIZE *COLS
+    
     def __init__(self) -> None:
         pass
 
@@ -37,17 +38,17 @@ class Game:
             difficulty: the game difficulty
         '''
         if difficulty == 'beginner':
-            ROWS = 9
-            COLS = 9
-            NUM_MINES = 10
+            self.ROWS = 9
+            self.COLS = 9
+            self.NUM_MINES = 10
         elif difficulty == 'intermediate':
-            ROWS = 16
-            COLS = 16
-            NUM_MINES = 40
+            self.ROWS = 16
+            self.COLS = 16
+            self.NUM_MINES = 40
         elif difficulty == 'expert':
-            ROWS = 30
-            COLS = 16
-            NUM_MINES = 99
+            self.ROWS = 30
+            self.COLS = 16
+            self.NUM_MINES = 99
 
     def new_game(self):
         '''Generate a new game from the start'''
@@ -90,3 +91,32 @@ class Board:
     def __init__(self):
         self.board = pg.Surface(WIDTH, HEIGHT)
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
+
+if __name__ == '__main__':
+    game = Game()
+    game.set_difficulty('beginner')
+    if (game.ROWS == 9) and (game.COLS == 9) and (game.NUM_MINES == 10):
+        print("PASSED!")
+    else:
+        print("FAILED!")
+        print(game.ROWS)
+        print(game.COLS)
+        print(game.NUM_MINES)
+
+    game.set_difficulty('intermediate')
+    if (game.ROWS == 16) and (game.COLS == 16) and (game.NUM_MINES == 40):
+        print("PASSED!")
+    else:
+        print("FAILED!")
+        print(game.ROWS)
+        print(game.COLS)
+        print(game.NUM_MINES)
+
+    game.set_difficulty('expert')
+    if (game.ROWS == 30) and (game.COLS == 16) and (game.NUM_MINES == 99):
+        print("PASSED!")
+    else:
+        print("FAILED!")
+        print(game.ROWS)
+        print(game.COLS)
+        print(game.NUM_MINES)
