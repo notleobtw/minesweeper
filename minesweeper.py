@@ -89,8 +89,12 @@ class Cell:
         self.state = state
         self.image = image
 
-    def draw(self, board):
-        '''Display the cell on the board'''
+    def draw(self, board : Board):
+        '''Display the cell on the board
+        
+        Args:
+            board: the game's board
+        '''
         # Revealed cell
         if self.revealed:
             board.blit(self.image, (self.x, self.y))
@@ -107,6 +111,17 @@ class Board:
     def __init__(self):
         self.board = pg.Surface(WIDTH, HEIGHT)
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
+
+    def draw(self, window):
+        '''Display the board to the game's window
+        
+        Args:
+            window: the game's window
+        '''
+        for row in self.list_of_cells:
+            for cell in row:
+                cell.draw(self.board)
+        window.blit(self.board, (0, 0))
 
 if __name__ == '__main__':
     game = Game()
