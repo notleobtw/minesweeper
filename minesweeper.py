@@ -1,4 +1,5 @@
 import pygame as pg
+import random
 
 CELL_SIZE = 32
 ROWS = 9
@@ -59,7 +60,7 @@ class Game:
             WIDTH = CELL_SIZE * ROWS
             HEIGHT = CELL_SIZE *COLS
 
-    def new_game(self, difficulty : str):
+    def new_game(self, difficulty : str = 'beginner'):
         '''Generate a new game from the start'''
         self.set_difficulty(difficulty)
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -126,6 +127,17 @@ class Board:
         self.board = pg.Surface((WIDTH, HEIGHT))
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
 
+    def place_mines(self):
+        '''Place mines in the board'''
+        for i in range(NUM_MINES):
+            while True:
+                x = random.randint(0, ROWS-1)
+                y = random.randint(0, COLS-1)
+                if self.board_list[x][y].type == ".":
+                    self.board_list[x][y].image = image_mine
+                    self.board_list[x][y].type = "X"
+                    break
+
     def draw(self, window):
         '''Display the board to the game's window
         
@@ -159,5 +171,5 @@ if __name__ == '__main__':
         print("FAILED!")
     
     while True:
-        game.new_game('expert')
+        game.new_game('intermediate')
         game.run_game()
