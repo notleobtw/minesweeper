@@ -148,9 +148,8 @@ class Board:
             for y in range(COLS):
                 if self.list_of_cells[x][y].state != "X":
                     nearby_mines = self.get_num_nearby_mines(x, y)
-                    if nearby_mines > 0:
-                        self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
-                        self.list_of_cells[x][y].state = "N"
+                    self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
+                    self.list_of_cells[x][y].state = "N"
 
 
     def get_num_nearby_mines(self, x : int, y : int) -> int:
