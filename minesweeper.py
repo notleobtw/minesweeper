@@ -109,15 +109,16 @@ class Cell:
         Args:
             board: the game's board
         '''
-        # Revealed cell
-        if self.revealed:
-            board.blit(self.image, (self.x, self.y))
-        # Flagged cell
-        elif self.flagged and not self.revealed:
-            board.blit(image_flag, (self.x, self.y))
-        # Unrevealed cell
-        elif not self.revealed:
-            board.blit(image_grid, (self.x, self.y))
+        # # Revealed cell
+        # if self.revealed:
+        #     board.blit(self.image, (self.x, self.y))
+        # # Flagged cell
+        # elif self.flagged and not self.revealed:
+        #     board.blit(image_flag, (self.x, self.y))
+        # # Unrevealed cell
+        # elif not self.revealed:
+        #     board.blit(self.image, (self.x, self.y))
+        board.blit(self.image, (self.x, self.y))
 
 
 class Board:
@@ -126,6 +127,7 @@ class Board:
     def __init__(self):
         self.board = pg.Surface((WIDTH, HEIGHT))
         self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
+        self.place_mines()
 
     def place_mines(self):
         '''Place mines in the board'''
@@ -133,9 +135,9 @@ class Board:
             while True:
                 x = random.randint(0, ROWS-1)
                 y = random.randint(0, COLS-1)
-                if self.board_list[x][y].type == ".":
-                    self.board_list[x][y].image = image_mine
-                    self.board_list[x][y].type = "X"
+                if self.list_of_cells[x][y].state == ".":
+                    self.list_of_cells[x][y].image = image_mine
+                    self.list_of_cells[x][y].state = "X"
                     break
 
     def draw(self, window):
@@ -171,5 +173,6 @@ if __name__ == '__main__':
         print("FAILED!")
     
     while True:
-        game.new_game('intermediate')
+        #Change this to see the board size changing
+        game.new_game('intermediate') 
         game.run_game()
