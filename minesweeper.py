@@ -69,6 +69,7 @@ class Game:
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
+            self.close_game()
             self.draw()
 
     def draw(self):
@@ -79,7 +80,10 @@ class Game:
 
     def close_game(self):
         '''Closes the game'''
-        pass
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit(0) 
 
 # State for a cell:
 #     '.': unknown
@@ -149,3 +153,7 @@ if __name__ == '__main__':
         print("PASSED!")
     else:
         print("FAILED!")
+    
+    while True:
+        game.new_game()
+        game.run_game()
