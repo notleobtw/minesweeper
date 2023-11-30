@@ -1,7 +1,6 @@
 import pygame as pg
 import pygame_menu
 import random
-import time
 
 pg.init()
 
@@ -13,7 +12,6 @@ NUM_MINES = 9
 WIDTH = CELL_SIZE * COLS
 HEIGHT = CELL_SIZE * ROWS
 FPS = 60
-click_time = 0
 
 font = pygame_menu.font.FONT_NEVIS
 
@@ -95,7 +93,20 @@ class Game:
         self.new_game_menu.add.button('Intermediate', lambda s=self : s.new_game('intermediate'))
         self.new_game_menu.add.button('Expert', lambda s=self : s.new_game('expert'))
         self.new_game_menu.mainloop(self.screen, fps_limit = FPS)
-
+        
+    def display_gameover_menu(self, heading):
+        my_theme = pygame_menu.themes.THEME_DEFAULT
+        my_theme.title_font_size = 64
+        my_theme.widget_font_size = 32
+        my_theme.title_font = font
+        self.gameover_menu = pygame_menu.Menu(heading, WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
+        if heading == 'Game Over':
+            self.gameover_menu.add.label('You clicked on a mine!')
+        elif heading == 'Cleared All Mines':
+            self.gameover_menu.add.label(f'Time: {self.time} seconds')
+        self.gameover_menu.add.vertical_margin(30)
+        self.gameover_menu.add.button('Play Again', lambda s=self : s.display_new_game_menu())
+        self.gameover_menu.mainloop(self.screenn, fps_limit = fps)
 
     def run_game(self):
         '''Run the game'''
@@ -132,7 +143,6 @@ class Game:
 
 
                 if event.button == 1:
-                    global click_time
                     if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed: 
                         #if clicked on a unrevealed and unflagged cell: 
                         if self.first_click:
@@ -171,7 +181,7 @@ class Game:
                             self.playing = False
 
                     #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
-                    if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and time.time() - click_time < 0.5 and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
+                    if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
                         for i in range(-1, 2):
                             for j in range(-1, 2):
                                 neighbour_x = row + i
@@ -186,8 +196,6 @@ class Game:
                                                     cell.image = image_mineFalse
                                                 elif cell.state == 'X':
                                                     cell.revealed = True
-                    
-                    click_time = time.time()
 
 
                 if event.button == 3:
@@ -246,7 +254,6 @@ class Board:
     def __init__(self):
         self.board = pg.Surface((WIDTH, HEIGHT))
         self.list_of_cells = [[Cell(col, row, '.', image_emptyGrid) for col in range(COLS)] for row in range(ROWS)]
-        print(ROWS, COLS)
         self.place_mines()
         self.place_clue()
         self.opened = []
@@ -356,23 +363,6 @@ class Board:
 
 if __name__ == '__main__':
     game = Game()
-    game.set_difficulty('beginner')
-    if (ROWS == 9) and (COLS == 9) and (NUM_MINES == 10):
-        print("PASSED!")
-    else:
-        print("FAILED!")
-
-    game.set_difficulty('intermediate')
-    if (ROWS == 16) and (COLS == 16) and (NUM_MINES == 40):
-        print("PASSED!")
-    else:
-        print("FAILED!")
-
-    game.set_difficulty('expert')
-    if (ROWS == 30) and (COLS == 16) and (NUM_MINES == 99):
-        print("PASSED!")
-    else:
-        print("FAILED!")
     
     while True:
         #Change this to see the board size changing 
