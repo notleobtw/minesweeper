@@ -350,7 +350,6 @@ class Board:
             while True:
                 x = random.randint(0, ROWS-1)
                 y = random.randint(0, COLS-1)
-                print(x,y)
                 if self.list_of_cells[x][y].state == ".":
                     self.list_of_cells[x][y].image = image_mine
                     self.list_of_cells[x][y].state = "X"
