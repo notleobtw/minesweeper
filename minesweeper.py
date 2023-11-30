@@ -135,12 +135,12 @@ class Game:
         panel = pg.Rect(0, HEIGHT, WIDTH, PANEL_HEIGHT)
         pg.draw.rect(self.screen, 'gray', panel)
 
-        time_text = my_font.render(f'Time:{str(self.time)}', True, 'gray30')
+        time_text = my_font.render(f'Time: {str(self.time)}', True, 'gray30')
         time_rect = time_text.get_rect()
         time_rect.center = (32*2, PANEL_HEIGHT // 2 + HEIGHT)
         self.screen.blit(time_text, time_rect)
 
-        flag_count_text = my_font.render(f'Flags:{str(self.num_flags)}', True, 'gray30')
+        flag_count_text = my_font.render(f'Flags: {str(self.num_flags)}', True, 'gray30')
         flag_count_rect = flag_count_text.get_rect()
         flag_count_rect.center = (WIDTH - 32*2, PANEL_HEIGHT // 2 + HEIGHT)
         self.screen.blit(flag_count_text, flag_count_rect)
@@ -158,6 +158,9 @@ class Game:
             if event.type == pg.QUIT:
                 pg.quit()
                 quit(0) 
+
+            if event.type == self.timer_event:
+                self.time += 1
             
             if event.type == pg.MOUSEBUTTONDOWN:
                 col, row = pg.mouse.get_pos()
@@ -225,7 +228,12 @@ class Game:
                 if event.button == 3:
                     if not self.board.list_of_cells[row][col].revealed:
                         #if not revealed, right click will flag the cell
-                        self.board.list_of_cells[row][col].flagged = not self.board.list_of_cells[row][col].flagged
+                        if self.board.list_of_cells[row][col].flagged:
+                            self.num_flags -= 1 
+                            self.board.list_of_cells[row][col].flagged = False
+                        elif not self.board.list_of_cells[row][col].flagged:
+                            self.num_flags += 1 
+                            self.board.list_of_cells[row][col].flagged = True
 
                 if self.check_win():
                     self.win = True
