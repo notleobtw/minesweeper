@@ -4,21 +4,21 @@
 Simple Minesweeper is a classic Minesweeper game inspired by the original Minesweeper game on Windows. The aim of this project is to create a basic version of the game that replicates the traditional Minesweeper experience with a simple, user-friendly interface. It will also include most of the features in the original game.
 
 # Prerequisites and installation instructions
-    Some fucntion might not work with lower version of python. Please use python 3/3.5 just to be sure
-    I only used pygame, pygame_menu and random.
-    Install by pip:
-        pip install pygame -U
-        pip install pygame-menu -U
+Please use python 3 or higher. Some fucntion might not work with lower version of Python. 
+I only used pygame, pygame_menu and random modules.
+Install by pip:
+    pip install pygame -U
+    pip install pygame-menu -U
 
-    Random should come with python
+Random should come with Python.
 
 # Instructions
-    Run the minesweeper.py file as a script
+Run the minesweeper.py file as a script.
 
 # Future directions
-    Adding user custom option for the map size and number of mines.
-    Improve user interface to be more appealing.
-    Maybe allow the game to work on different devices and OS.
+Adding user custom option for the map size and number of mines.
+Improve user interface to be more appealing.
+Maybe allow the game to work on different devices and OS.
 
 # Proposed Features
 
