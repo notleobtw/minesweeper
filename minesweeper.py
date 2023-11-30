@@ -13,7 +13,8 @@ WIDTH = CELL_SIZE * COLS
 HEIGHT = CELL_SIZE * ROWS
 FPS = 60
 
-font = pygame_menu.font.FONT_NEVIS
+my_font = pg.font.SysFont('consolas', 22)
+
 
 image_emptyGrid = pg.image.load("Sprites/empty.png")
 image_flag = pg.image.load("Sprites/flag.png")
@@ -78,16 +79,23 @@ class Game:
         '''Generate a new game from the start'''
         self.set_difficulty(difficulty)
         self.set_up_screen()
+        self.num_flags = 0
+
+        self.time = 0
+        self.timer_event = pg.USEREVENT + 1
+        pg.time.set_timer(self.timer_event, 1000)
+
         self.new_game_menu.disable()
         self.board = Board()
         self.board.display_board() #you can delete this
         self.first_click = True
 
     def display_new_game_menu(self):
+        '''The main menu of the game'''
         my_theme = pygame_menu.themes.THEME_DEFAULT
         my_theme.title_font_size = 64
         my_theme.widget_font_size = 32
-        my_theme.title_font = font
+        my_theme.title_font = pygame_menu.font.FONT_NEVIS
         self.new_game_menu = pygame_menu.Menu('MINESWEEPER', WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
         self.new_game_menu.add.button('Beginner', lambda s=self : s.new_game('beginner'))
         self.new_game_menu.add.button('Intermediate', lambda s=self : s.new_game('intermediate'))
@@ -98,7 +106,7 @@ class Game:
         my_theme = pygame_menu.themes.THEME_DEFAULT
         my_theme.title_font_size = 64
         my_theme.widget_font_size = 32
-        my_theme.title_font = font
+        my_theme.title_font = pygame_menu.font.FONT_NEVIS
         self.gameover_menu = pygame_menu.Menu(heading, WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
         if heading == 'Game Over':
             self.gameover_menu.add.label('You clicked on a mine!')
@@ -106,7 +114,7 @@ class Game:
             self.gameover_menu.add.label(f'Time: {self.time} seconds')
         self.gameover_menu.add.vertical_margin(30)
         self.gameover_menu.add.button('Play Again', lambda s=self : s.display_new_game_menu())
-        self.gameover_menu.mainloop(self.screenn, fps_limit = fps)
+        self.gameover_menu.mainloop(self.screenn, fps_limit = FPS)
 
     def run_game(self):
         '''Run the game'''
@@ -120,7 +128,22 @@ class Game:
         '''Display the game'''
         self.screen.fill('grey')
         self.board.draw(self.screen)
+        self.draw_panel()
         pg.display.flip()
+
+    def draw_panel(self):
+        panel = pg.Rect(0, HEIGHT, WIDTH, PANEL_HEIGHT)
+        pg.draw.rect(self.screen, 'gray', panel)
+
+        time_text = my_font.render(f'Time:{str(self.time)}', True, 'gray30')
+        time_rect = time_text.get_rect()
+        time_rect.center = (32*2, PANEL_HEIGHT // 2 + HEIGHT)
+        self.screen.blit(time_text, time_rect)
+
+        flag_count_text = my_font.render(f'Flags:{str(self.num_flags)}', True, 'gray30')
+        flag_count_rect = flag_count_text.get_rect()
+        flag_count_rect.center = (WIDTH - 32*2, PANEL_HEIGHT // 2 + HEIGHT)
+        self.screen.blit(flag_count_text, flag_count_rect)
 
     def check_win(self):
         '''Check if the game is won'''
@@ -140,7 +163,8 @@ class Game:
                 col, row = pg.mouse.get_pos()
                 row //= CELL_SIZE
                 col //= CELL_SIZE
-
+                if col >= COLS or row >= ROWS:
+                    continue
 
                 if event.button == 1:
                     if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed: 
