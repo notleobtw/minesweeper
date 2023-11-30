@@ -99,7 +99,7 @@ class Game:
 
     def display_new_game_menu(self):
         '''The main menu of the game'''
-        my_theme = pygame_menu.themes.THEME_DEFAULT
+        my_theme = pygame_menu.themes.THEME_BLUE
         if ROWS < 10:
             my_theme.title_font_size = 32
         else:    
@@ -117,7 +117,7 @@ class Game:
         
     def display_gameover_menu(self, heading):
         '''The Game Over menu'''
-        my_theme = pygame_menu.themes.THEME_DEFAULT
+        my_theme = pygame_menu.themes.THEME_BLUE
         my_theme.title_font_size = 40
         my_theme.widget_font_size = 25
         my_theme.title_font = pygame_menu.font.FONT_NEVIS
