@@ -69,6 +69,7 @@ class Game:
         self.set_difficulty(difficulty)
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.board = Board()
+        self.board.display_board() #you can delete this
         self.first_click = True
 
     def run_game(self):
@@ -99,26 +100,42 @@ class Game:
 
                 if event.button == 1:
                     global click_time
-                    if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed:
-                        #if not flagged and not revealed, left click will open the cell
+                    if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed: 
+                        #if clicked on a unrevealed and unflagged cell: 
                         if self.first_click:
-                            while self.board.list_of_cells[row][col].state == 'X':
-                                self.board = Board()
                             self.first_click = False
+
+                            if self.board.list_of_cells[row][col].state == 'X':
+                                #if the first click is a bomb, move it to the first cell that is not a bomb
+                                self.board.list_of_cells[row][col].state = '.'
+
+                                looping = True
+                                for each_row in self.board.list_of_cells :
+                                    for cell in each_row:
+                                        if cell.state != 'X':
+                                            cell.state = 'X'
+                                            looping = False
+                                            break
+                                    if looping == False:
+                                        break
+                                
+                                self.board.place_clue()
+                                self.board.display_board() #you can delete this
                         
                         if not self.board.open_cell(row, col):
                             #clicked on a mine, reveal every bomb and every wrong flag
                             for each_row in self.board.list_of_cells:
                                 for cell in each_row:
                                     if cell.flagged and cell.state != 'X':
-                                        #flagged wrong mine
+                                        #reveal wrong flag
                                         cell.flagged = False
                                         cell.revealed = True
                                         cell.image = image_mineFalse
                                     elif cell.state == 'X':
+                                        #reveal all bombs
                                         cell.revealed = True
 
-                    #double click to reveal all cells around a number clue if you have already flagged all mines around
+                    #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and time.time() - click_time < 0.5 and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
                         for i in range(-1, 2):
                             for j in range(-1, 2):
@@ -126,11 +143,9 @@ class Game:
                                 neighbour_y = col + j
                                 if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS and not self.board.list_of_cells[neighbour_x][neighbour_y].flagged and not self.board.list_of_cells[neighbour_x][neighbour_y].revealed:
                                     if not self.board.open_cell(neighbour_x, neighbour_y):
-                                        #clicked on a mine, reveal every bomb and every wrong flag
                                         for each_row in self.board.list_of_cells:
                                             for cell in each_row:
                                                 if cell.flagged and cell.state != 'X':
-                                                    #flagged wrong mine
                                                     cell.flagged = False
                                                     cell.revealed = True
                                                     cell.image = image_mineFalse
@@ -176,6 +191,9 @@ class Cell:
             board.blit(image_flag, (self.x, self.y))
         elif not self.revealed:
             board.blit(image_grid, (self.x, self.y))
+
+    def __repr__(self):
+        return self.state
 
 
 
@@ -282,6 +300,12 @@ class Board:
                         if (neighbour_x, neighbour_y) not in self.opened:
                             self.open_cell(neighbour_x, neighbour_y)
             return True
+        
+    def display_board(self):
+        '''Display the board code to the terminal'''
+        print("THE BOARD DISPLAY CODE:")
+        for row in self.list_of_cells:
+            print(row)
             
 
 
