@@ -1,15 +1,21 @@
 import pygame as pg
+import pygame_menu
 import random
 import time
 
+pg.init()
+
+PANEL_HEIGHT = 64
 CELL_SIZE = 32
-ROWS = 9
-COLS = 9
-NUM_MINES = 10
-WIDTH = CELL_SIZE * ROWS
-HEIGHT = CELL_SIZE *COLS
+ROWS = 16
+COLS = 30
+NUM_MINES = 9
+WIDTH = CELL_SIZE * COLS
+HEIGHT = CELL_SIZE * ROWS
 FPS = 60
 click_time = 0
+
+font = pygame_menu.font.FONT_NEVIS
 
 image_emptyGrid = pg.image.load("Sprites/empty.png")
 image_flag = pg.image.load("Sprites/flag.png")
@@ -36,6 +42,8 @@ class Game:
         pg.display.set_caption("Leo's Minesweeper")
         self.clock = pg.time.Clock()
         self.first_click = True
+        self.set_up_screen()
+        self.display_new_game_menu()
 
     def set_difficulty(self, difficulty : str):
         '''Set the game difficulty
@@ -48,29 +56,46 @@ class Game:
             ROWS = 9
             COLS = 9
             NUM_MINES = 10
-            WIDTH = CELL_SIZE * ROWS
-            HEIGHT = CELL_SIZE *COLS
+            WIDTH = CELL_SIZE * COLS
+            HEIGHT = CELL_SIZE * ROWS
             
         elif difficulty == 'intermediate':
             ROWS = 16
             COLS = 16
             NUM_MINES = 40
-            WIDTH = CELL_SIZE * ROWS
-            HEIGHT = CELL_SIZE *COLS
+            WIDTH = CELL_SIZE * COLS
+            HEIGHT = CELL_SIZE * ROWS
         elif difficulty == 'expert':
-            ROWS = 30
-            COLS = 16
+            ROWS = 16
+            COLS = 30
             NUM_MINES = 99
-            WIDTH = CELL_SIZE * ROWS
-            HEIGHT = CELL_SIZE *COLS
+            WIDTH = CELL_SIZE * COLS
+            HEIGHT = CELL_SIZE * ROWS
 
-    def new_game(self, difficulty : str = 'beginner'):
+    def set_up_screen(self):
+        '''Set up the game screen'''
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT + PANEL_HEIGHT))
+
+    def new_game(self, difficulty : str = 'expert'):
         '''Generate a new game from the start'''
         self.set_difficulty(difficulty)
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.set_up_screen()
+        self.new_game_menu.disable()
         self.board = Board()
         self.board.display_board() #you can delete this
         self.first_click = True
+
+    def display_new_game_menu(self):
+        my_theme = pygame_menu.themes.THEME_DEFAULT
+        my_theme.title_font_size = 64
+        my_theme.widget_font_size = 32
+        my_theme.title_font = font
+        self.new_game_menu = pygame_menu.Menu('MINESWEEPER', WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
+        self.new_game_menu.add.button('Beginner', lambda s=self : s.new_game('beginner'))
+        self.new_game_menu.add.button('Intermediate', lambda s=self : s.new_game('intermediate'))
+        self.new_game_menu.add.button('Expert', lambda s=self : s.new_game('expert'))
+        self.new_game_menu.mainloop(self.screen, fps_limit = FPS)
+
 
     def run_game(self):
         '''Run the game'''
@@ -220,7 +245,8 @@ class Board:
 
     def __init__(self):
         self.board = pg.Surface((WIDTH, HEIGHT))
-        self.list_of_cells = [[Cell(row, col, '.', image_emptyGrid) for row in range(ROWS)] for col in range(COLS)]
+        self.list_of_cells = [[Cell(col, row, '.', image_emptyGrid) for col in range(COLS)] for row in range(ROWS)]
+        print(ROWS, COLS)
         self.place_mines()
         self.place_clue()
         self.opened = []
@@ -231,6 +257,7 @@ class Board:
             while True:
                 x = random.randint(0, ROWS-1)
                 y = random.randint(0, COLS-1)
+                print(x,y)
                 if self.list_of_cells[x][y].state == ".":
                     self.list_of_cells[x][y].image = image_mine
                     self.list_of_cells[x][y].state = "X"
@@ -348,6 +375,5 @@ if __name__ == '__main__':
         print("FAILED!")
     
     while True:
-        #Change this to see the board size changing
-        game.new_game('beginner') 
+        #Change this to see the board size changing 
         game.run_game()
