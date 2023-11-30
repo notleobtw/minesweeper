@@ -207,6 +207,7 @@ class Game:
                             if self.board.list_of_cells[row][col].state == 'X':
                                 #if the first click is a bomb, move it to the first cell that is not a bomb
                                 self.board.list_of_cells[row][col].state = '.'
+                                self.board.list_of_cells[row][col].image = image_emptyGrid
 
                                 looping = True
                                 for each_row in self.board.list_of_cells :
