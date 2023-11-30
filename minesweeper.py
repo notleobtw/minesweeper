@@ -35,6 +35,7 @@ class Game:
     def __init__(self) -> None:
         pg.display.set_caption("Leo's Minesweeper")
         self.clock = pg.time.Clock()
+        self.first_click = True
 
     def set_difficulty(self, difficulty : str):
         '''Set the game difficulty
@@ -68,6 +69,7 @@ class Game:
         self.set_difficulty(difficulty)
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.board = Board()
+        self.first_click = True
 
     def run_game(self):
         '''Run the game'''
@@ -99,6 +101,11 @@ class Game:
                     global click_time
                     if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed:
                         #if not flagged and not revealed, left click will open the cell
+                        if self.first_click:
+                            while self.board.list_of_cells[row][col].state == 'X':
+                                self.board = Board()
+                            self.first_click = False
+                        
                         if not self.board.open_cell(row, col):
                             #clicked on a mine, reveal every bomb and every wrong flag
                             for each_row in self.board.list_of_cells:
@@ -111,6 +118,7 @@ class Game:
                                     elif cell.state == 'X':
                                         cell.revealed = True
 
+                    #double click to reveal all cells around a number clue if you have already flagged all mines around
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and time.time() - click_time < 0.5 and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
                         for i in range(-1, 2):
                             for j in range(-1, 2):
