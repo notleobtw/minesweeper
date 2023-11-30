@@ -42,6 +42,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.first_click = True
         self.set_up_screen()
+        #Start to run from here
         self.display_new_game_menu()
 
     def set_difficulty(self, difficulty : str):
@@ -210,12 +211,18 @@ class Game:
                                         #reveal all bombs
                                         cell.revealed = True
                             
-                            # self.playing = False
+                            self.playing = False
                             self.draw()
-                            for event in pg.event.get():
+                            user_click = False
+                            while user_click == False:
+                                event = pg.event.wait()
                                 if event.type == pg.MOUSEBUTTONDOWN:
-                                    break
-                            self.display_gameover_menu('Game Over')
+                                    self.display_gameover_menu('Game Over')
+                                    user_click = True
+                                elif event.type == pg.QUIT:
+                                    pg.quit()
+                                    quit(0) 
+
 
                     #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
@@ -247,14 +254,22 @@ class Game:
 
                 if self.check_win():
                     self.win = True
-                    # self.playing = False
+                    self.playing = False
                     for each_row in self.board.list_of_cells:
                         for cell in each_row:
                             if not cell.revealed:
                                 #flag all mines if win
                                 cell.flagged = True
                     self.draw()
-                    self.display_gameover_menu('Cleared All Mines')
+                    user_click = False
+                    while user_click == False:
+                        event = pg.event.wait()
+                        if event.type == pg.MOUSEBUTTONDOWN:
+                            self.display_gameover_menu('You Win!!')
+                            user_click = True
+                        elif event.type == pg.QUIT:
+                            pg.quit()
+                            quit(0)
                     
 
             
