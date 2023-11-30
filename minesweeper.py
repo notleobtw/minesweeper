@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import time
 
 CELL_SIZE = 32
 ROWS = 9
@@ -8,6 +9,7 @@ NUM_MINES = 10
 WIDTH = CELL_SIZE * ROWS
 HEIGHT = CELL_SIZE *COLS
 FPS = 60
+click_time = 0
 
 image_emptyGrid = pg.image.load("Sprites/empty.png")
 image_flag = pg.image.load("Sprites/flag.png")
@@ -94,6 +96,7 @@ class Game:
                 col //= CELL_SIZE
 
                 if event.button == 1:
+                    global click_time
                     if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed:
                         #if not flagged and not revealed, left click will open the cell
                         if not self.board.open_cell(row, col):
@@ -107,6 +110,26 @@ class Game:
                                         cell.image = image_mineFalse
                                     elif cell.state == 'X':
                                         cell.revealed = True
+
+                    if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and time.time() - click_time < 0.5 and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
+                        for i in range(-1, 2):
+                            for j in range(-1, 2):
+                                neighbour_x = row + i
+                                neighbour_y = col + j
+                                if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS and not self.board.list_of_cells[neighbour_x][neighbour_y].flagged and not self.board.list_of_cells[neighbour_x][neighbour_y].revealed:
+                                    if not self.board.open_cell(neighbour_x, neighbour_y):
+                                        #clicked on a mine, reveal every bomb and every wrong flag
+                                        for each_row in self.board.list_of_cells:
+                                            for cell in each_row:
+                                                if cell.flagged and cell.state != 'X':
+                                                    #flagged wrong mine
+                                                    cell.flagged = False
+                                                    cell.revealed = True
+                                                    cell.image = image_mineFalse
+                                                elif cell.state == 'X':
+                                                    cell.revealed = True
+                    
+                    click_time = time.time()
 
 
                 if event.button == 3:
@@ -179,6 +202,24 @@ class Board:
                         self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
                         self.list_of_cells[x][y].state = "N"
 
+    def get_num_nearby_flags(self, x : int, y : int) -> int:
+        '''Count how many flags are neighbor with this cell
+        
+        Args:
+            x: the row of the cell
+            y: the col of the cell
+
+        Returns:
+            nearby_flags: the number of nearby flags
+        '''
+        nearby_flags = 0
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                neighbour_x = x + i
+                neighbour_y = y + j
+                if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS and self.list_of_cells[neighbour_x][neighbour_y].flagged:
+                    nearby_flags += 1
+        return nearby_flags
 
     def get_num_nearby_mines(self, x : int, y : int) -> int:
         '''Count how many mines are neighbor with this cell
@@ -198,6 +239,7 @@ class Board:
                 if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS and self.list_of_cells[neighbour_x][neighbour_y].state == 'X':
                     nearby_mines += 1
         return nearby_mines
+
 
     def draw(self, window):
         '''Display the board to the game's window
@@ -228,10 +270,8 @@ class Board:
                 for j in range(-1, 2):
                     neighbour_x = x + i
                     neighbour_y = y + j
-                    print(neighbour_x, " ", neighbour_y)
                     if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS:
                         if (neighbour_x, neighbour_y) not in self.opened:
-                            print(neighbour_x, " ", neighbour_y)
                             self.open_cell(neighbour_x, neighbour_y)
             return True
             
