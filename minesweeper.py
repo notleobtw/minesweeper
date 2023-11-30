@@ -119,7 +119,13 @@ class Cell:
         # # Unrevealed cell
         # elif not self.revealed:
         #     board.blit(self.image, (self.x, self.y))
-        board.blit(self.image, (self.x, self.y))
+        if not self.flagged and self.revealed:
+            board.blit(self.image, (self.x, self.y))
+        elif self.flagged and not self.revealed:
+            board.blit(image_flag, (self.x, self.y))
+        elif not self.revealed:
+            board.blit(image_grid, (self.x, self.y))
+
 
 
 class Board:
