@@ -72,7 +72,7 @@ class Game:
         self.playing = True
         while self.playing:
             self.clock.tick(FPS)
-            self.close_game()
+            self.events()
             self.draw()
 
     def draw(self):
@@ -81,12 +81,32 @@ class Game:
         self.board.draw(self.screen)
         pg.display.flip()
 
-    def close_game(self):
-        '''Closes the game'''
+    def events(self):
+        '''Events for the game'''
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 quit(0) 
+            
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouseY, mouseX = pg.mouse.get_pos()
+                print(mouseX," ",mouseY)
+
+                mouseX //= CELL_SIZE
+                mouseY //= CELL_SIZE
+
+                if event.button == 1:
+                    if not self.board.list_of_cells[mouseX][mouseY].flagged and not self.board.list_of_cells[mouseX][mouseY].revealed:
+                        #if not flagged and not revealed, left click will open the cell
+                        pass
+
+                if event.button == 3:
+                    if not self.board.list_of_cells[mouseX][mouseY].revealed:
+                        #if not revealed, right click will flag the cell
+                        self.board.list_of_cells[mouseX][mouseY].flagged = not self.board.list_of_cells[mouseX][mouseY].flagged
+
+
+            
 
 # State for a cell:
 #     '.': unknown
