@@ -86,6 +86,13 @@ class Game:
         self.board.draw(self.screen)
         pg.display.flip()
 
+    def check_win(self):
+        '''Check if the game is won'''
+        if len(self.board.opened) + NUM_MINES == ROWS*COLS:
+            return True
+        else:
+            return False
+
     def events(self):
         '''Events for the game'''
         for event in pg.event.get():
@@ -97,6 +104,7 @@ class Game:
                 col, row = pg.mouse.get_pos()
                 row //= CELL_SIZE
                 col //= CELL_SIZE
+
 
                 if event.button == 1:
                     global click_time
@@ -134,6 +142,8 @@ class Game:
                                     elif cell.state == 'X':
                                         #reveal all bombs
                                         cell.revealed = True
+                            
+                            self.playing = False
 
                     #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and time.time() - click_time < 0.5 and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
@@ -160,6 +170,14 @@ class Game:
                         #if not revealed, right click will flag the cell
                         self.board.list_of_cells[row][col].flagged = not self.board.list_of_cells[row][col].flagged
 
+                if self.check_win():
+                    self.win = True
+                    self.playing = False
+                    for each_row in self.board.list_of_cells:
+                        for cell in each_row:
+                            if not cell.revealed:
+                                #flag all mines if win
+                                cell.flagged = True
 
             
 
@@ -266,7 +284,6 @@ class Board:
                     nearby_mines += 1
         return nearby_mines
 
-
     def draw(self, window):
         '''Display the board to the game's window
         
@@ -300,7 +317,7 @@ class Board:
                         if (neighbour_x, neighbour_y) not in self.opened:
                             self.open_cell(neighbour_x, neighbour_y)
             return True
-        
+    
     def display_board(self):
         '''Display the board code to the terminal'''
         print("THE BOARD DISPLAY CODE:")
@@ -332,5 +349,5 @@ if __name__ == '__main__':
     
     while True:
         #Change this to see the board size changing
-        game.new_game('intermediate') 
+        game.new_game('beginner') 
         game.run_game()
