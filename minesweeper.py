@@ -45,6 +45,7 @@ class Game:
         #Start to run from here
         self.display_new_game_menu()
 
+
     def set_difficulty(self, difficulty : str):
         '''Set the game difficulty
         
@@ -72,9 +73,11 @@ class Game:
             WIDTH = CELL_SIZE * COLS
             HEIGHT = CELL_SIZE * ROWS
 
+
     def set_up_screen(self):
         '''Set up the game screen'''
         self.screen = pg.display.set_mode((WIDTH, HEIGHT + PANEL_HEIGHT))
+
 
     def new_game(self, difficulty : str = 'expert'):
         '''Generate a new game from the start'''
@@ -93,6 +96,7 @@ class Game:
 
         self.run_game()
 
+
     def display_new_game_menu(self):
         '''The main menu of the game'''
         my_theme = pygame_menu.themes.THEME_DEFAULT
@@ -102,24 +106,31 @@ class Game:
             my_theme.title_font_size = 64
         my_theme.widget_font_size = 32
         my_theme.title_font = pygame_menu.font.FONT_NEVIS
+        
         self.new_game_menu = pygame_menu.Menu('MINESWEEPER', WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
+        
         self.new_game_menu.add.button('Beginner', lambda s=self : s.new_game('beginner'))
         self.new_game_menu.add.button('Intermediate', lambda s=self : s.new_game('intermediate'))
         self.new_game_menu.add.button('Expert', lambda s=self : s.new_game('expert'))
+        
         self.new_game_menu.mainloop(self.screen, fps_limit = FPS)
         
     def display_gameover_menu(self, heading):
+        '''The Game Over menu'''
         my_theme = pygame_menu.themes.THEME_DEFAULT
         my_theme.title_font_size = 40
         my_theme.widget_font_size = 25
         my_theme.title_font = pygame_menu.font.FONT_NEVIS
+        
         self.gameover_menu = pygame_menu.Menu(heading, WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
+        
         if heading == 'Game Over':
             self.gameover_menu.add.label('You clicked on a mine!')
         elif heading == 'You Win!!':
             self.gameover_menu.add.label(f'Time: {self.time} seconds')
         self.gameover_menu.add.vertical_margin(30)
         self.gameover_menu.add.button('Play Again', lambda s=self : s.__init__())
+        
         self.gameover_menu.mainloop(self.screen, fps_limit = FPS)
 
     def run_game(self):
@@ -138,6 +149,7 @@ class Game:
         pg.display.flip()
 
     def draw_panel(self):
+        '''Draw the bottom panel'''
         panel = pg.Rect(0, HEIGHT, WIDTH, PANEL_HEIGHT)
         pg.draw.rect(self.screen, 'gray', panel)
 
@@ -151,8 +163,13 @@ class Game:
         flag_count_rect.center = (WIDTH - 32*2, PANEL_HEIGHT // 2 + HEIGHT)
         self.screen.blit(flag_count_text, flag_count_rect)
 
-    def check_win(self):
-        '''Check if the game is won'''
+    def check_win(self) -> bool:
+        '''Check if the game is won
+        
+        Returns:
+            True if won
+            False otherwise
+        '''
         if len(self.board.opened) + NUM_MINES == ROWS*COLS:
             return True
         else:
@@ -162,22 +179,28 @@ class Game:
         '''Events for the game'''
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                #Close the game
                 pg.quit()
                 quit(0) 
 
             if event.type == self.timer_event:
+                #Run the timer
                 self.time += 1
             
             if event.type == pg.MOUSEBUTTONDOWN:
+                #User clicked
                 col, row = pg.mouse.get_pos()
                 row //= CELL_SIZE
                 col //= CELL_SIZE
                 if col >= COLS or row >= ROWS:
+                    #If click out of bound
                     continue
 
                 if event.button == 1:
+                    #left click
                     if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed: 
                         #if clicked on a unrevealed and unflagged cell: 
+
                         if self.first_click:
                             self.first_click = False
 
@@ -211,6 +234,7 @@ class Game:
                                         #reveal all bombs
                                         cell.revealed = True
                             
+                            #Game over menu
                             self.playing = False
                             self.draw()
                             user_click = False
@@ -224,7 +248,7 @@ class Game:
                                     quit(0) 
 
 
-                    #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
+                    #click on a clue to reveal all cells around that clue if you have already flagged all mines around (just the code block right above but with 2 loops)
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
                         for i in range(-1, 2):
                             for j in range(-1, 2):
@@ -243,8 +267,9 @@ class Game:
 
 
                 if event.button == 3:
+                    #right click
                     if not self.board.list_of_cells[row][col].revealed:
-                        #if not revealed, right click will flag the cell
+                        #if not revealed, right click will flag the cell or unflag the cell
                         if self.board.list_of_cells[row][col].flagged:
                             self.num_flags -= 1 
                             self.board.list_of_cells[row][col].flagged = False
@@ -253,13 +278,14 @@ class Game:
                             self.board.list_of_cells[row][col].flagged = True
 
                 if self.check_win():
-                    self.win = True
                     self.playing = False
                     for each_row in self.board.list_of_cells:
                         for cell in each_row:
                             if not cell.revealed:
                                 #flag all mines if win
                                 cell.flagged = True
+                    
+                    #Game won!!
                     self.draw()
                     user_click = False
                     while user_click == False:
@@ -390,6 +416,17 @@ class Board:
         window.blit(self.board, (0, 0))
 
     def open_cell(self, x : int, y : int) -> bool:
+        '''Open this cell
+        
+        Args:
+            x: the row of the cell
+            y: the col of the cell
+            
+        Return:
+            False if the cell is a mine
+            True if the cell is a clue
+            Recurse if empty cell
+        '''
         self.opened.append((x,y))
         if self.list_of_cells[x][y].state == 'X':
             #clicked on a bomb
@@ -401,7 +438,7 @@ class Board:
             self.list_of_cells[x][y].revealed = True
             return True
         else:
-            #click on an empty cell
+            #click on an empty cell, reveal all neighbor cells
             self.list_of_cells[x][y].revealed = True
             for i in range(-1, 2):
                 for j in range(-1, 2):
