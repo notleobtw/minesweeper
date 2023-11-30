@@ -90,10 +90,15 @@ class Game:
         self.board.display_board() #you can delete this
         self.first_click = True
 
+        self.run_game()
+
     def display_new_game_menu(self):
         '''The main menu of the game'''
         my_theme = pygame_menu.themes.THEME_DEFAULT
-        my_theme.title_font_size = 64
+        if ROWS < 10:
+            my_theme.title_font_size = 32
+        else:    
+            my_theme.title_font_size = 64
         my_theme.widget_font_size = 32
         my_theme.title_font = pygame_menu.font.FONT_NEVIS
         self.new_game_menu = pygame_menu.Menu('MINESWEEPER', WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
@@ -104,17 +109,17 @@ class Game:
         
     def display_gameover_menu(self, heading):
         my_theme = pygame_menu.themes.THEME_DEFAULT
-        my_theme.title_font_size = 64
-        my_theme.widget_font_size = 32
+        my_theme.title_font_size = 40
+        my_theme.widget_font_size = 25
         my_theme.title_font = pygame_menu.font.FONT_NEVIS
         self.gameover_menu = pygame_menu.Menu(heading, WIDTH, HEIGHT + PANEL_HEIGHT, theme = my_theme)
         if heading == 'Game Over':
             self.gameover_menu.add.label('You clicked on a mine!')
-        elif heading == 'Cleared All Mines':
+        elif heading == 'You Win!!':
             self.gameover_menu.add.label(f'Time: {self.time} seconds')
         self.gameover_menu.add.vertical_margin(30)
-        self.gameover_menu.add.button('Play Again', lambda s=self : s.display_new_game_menu())
-        self.gameover_menu.mainloop(self.screenn, fps_limit = FPS)
+        self.gameover_menu.add.button('Play Again', lambda s=self : s.__init__())
+        self.gameover_menu.mainloop(self.screen, fps_limit = FPS)
 
     def run_game(self):
         '''Run the game'''
@@ -205,7 +210,12 @@ class Game:
                                         #reveal all bombs
                                         cell.revealed = True
                             
-                            self.playing = False
+                            # self.playing = False
+                            self.draw()
+                            for event in pg.event.get():
+                                if event.type == pg.MOUSEBUTTONDOWN:
+                                    break
+                            self.display_gameover_menu('Game Over')
 
                     #double click to reveal all cells around a number clue if you have already flagged all mines around (just the code block right above but with a loop and double click)
                     if self.board.list_of_cells[row][col].revealed and self.board.list_of_cells[row][col].state == 'N' and self.board.get_num_nearby_flags(row,col) == self.board.get_num_nearby_mines(row,col):
@@ -237,12 +247,15 @@ class Game:
 
                 if self.check_win():
                     self.win = True
-                    self.playing = False
+                    # self.playing = False
                     for each_row in self.board.list_of_cells:
                         for cell in each_row:
                             if not cell.revealed:
                                 #flag all mines if win
                                 cell.flagged = True
+                    self.draw()
+                    self.display_gameover_menu('Cleared All Mines')
+                    
 
             
 
@@ -395,7 +408,3 @@ class Board:
 
 if __name__ == '__main__':
     game = Game()
-    
-    while True:
-        #Change this to see the board size changing 
-        game.run_game()
