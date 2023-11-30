@@ -89,29 +89,38 @@ class Game:
                 quit(0) 
             
             if event.type == pg.MOUSEBUTTONDOWN:
-                mouseY, mouseX = pg.mouse.get_pos()
-                print(mouseX," ",mouseY)
-
-                mouseX //= CELL_SIZE
-                mouseY //= CELL_SIZE
+                col, row = pg.mouse.get_pos()
+                row //= CELL_SIZE
+                col //= CELL_SIZE
 
                 if event.button == 1:
-                    if not self.board.list_of_cells[mouseX][mouseY].flagged and not self.board.list_of_cells[mouseX][mouseY].revealed:
+                    if not self.board.list_of_cells[row][col].flagged and not self.board.list_of_cells[row][col].revealed:
                         #if not flagged and not revealed, left click will open the cell
-                        pass
+                        if not self.board.open_cell(row, col):
+                            #clicked on a mine, reveal every bomb and every wrong flag
+                            for each_row in self.board.list_of_cells:
+                                for cell in each_row:
+                                    if cell.flagged and cell.state != 'X':
+                                        #flagged wrong mine
+                                        cell.flagged = False
+                                        cell.revealed = True
+                                        cell.image = image_mineFalse
+                                    elif cell.state == 'X':
+                                        cell.revealed = True
+
 
                 if event.button == 3:
-                    if not self.board.list_of_cells[mouseX][mouseY].revealed:
+                    if not self.board.list_of_cells[row][col].revealed:
                         #if not revealed, right click will flag the cell
-                        self.board.list_of_cells[mouseX][mouseY].flagged = not self.board.list_of_cells[mouseX][mouseY].flagged
+                        self.board.list_of_cells[row][col].flagged = not self.board.list_of_cells[row][col].flagged
 
 
             
 
 # State for a cell:
-#     '.': unknown
+#     '.': unknown (or empty)
 #     'X': mine
-#     'N': a number (empty is 0)
+#     'N': a number
 
 
 class Cell:
@@ -130,15 +139,6 @@ class Cell:
         Args:
             board: the game's board
         '''
-        # # Revealed cell
-        # if self.revealed:
-        #     board.blit(self.image, (self.x, self.y))
-        # # Flagged cell
-        # elif self.flagged and not self.revealed:
-        #     board.blit(image_flag, (self.x, self.y))
-        # # Unrevealed cell
-        # elif not self.revealed:
-        #     board.blit(self.image, (self.x, self.y))
         if not self.flagged and self.revealed:
             board.blit(self.image, (self.x, self.y))
         elif self.flagged and not self.revealed:
@@ -153,9 +153,10 @@ class Board:
 
     def __init__(self):
         self.board = pg.Surface((WIDTH, HEIGHT))
-        self.list_of_cells = [[Cell(row, col, '.', image_grid) for row in range(ROWS)] for col in range(COLS)]
+        self.list_of_cells = [[Cell(row, col, '.', image_emptyGrid) for row in range(ROWS)] for col in range(COLS)]
         self.place_mines()
         self.place_clue()
+        self.opened = []
 
     def place_mines(self):
         '''Place mines in the board'''
@@ -174,8 +175,9 @@ class Board:
             for y in range(COLS):
                 if self.list_of_cells[x][y].state != "X":
                     nearby_mines = self.get_num_nearby_mines(x, y)
-                    self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
-                    self.list_of_cells[x][y].state = "N"
+                    if nearby_mines > 0:
+                        self.list_of_cells[x][y].image = image_grid_number[nearby_mines]
+                        self.list_of_cells[x][y].state = "N"
 
 
     def get_num_nearby_mines(self, x : int, y : int) -> int:
@@ -207,6 +209,33 @@ class Board:
             for cell in row:
                 cell.draw(self.board)
         window.blit(self.board, (0, 0))
+
+    def open_cell(self, x : int, y : int) -> bool:
+        self.opened.append((x,y))
+        if self.list_of_cells[x][y].state == 'X':
+            #clicked on a bomb
+            self.list_of_cells[x][y].revealed = True
+            self.list_of_cells[x][y].image = image_mineClicked
+            return False
+        elif self.list_of_cells[x][y].state == 'N':
+            #clicked on a clue number
+            self.list_of_cells[x][y].revealed = True
+            return True
+        else:
+            #click on an empty cell
+            self.list_of_cells[x][y].revealed = True
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    neighbour_x = x + i
+                    neighbour_y = y + j
+                    print(neighbour_x, " ", neighbour_y)
+                    if 0 <= neighbour_x < ROWS and 0 <= neighbour_y < COLS:
+                        if (neighbour_x, neighbour_y) not in self.opened:
+                            print(neighbour_x, " ", neighbour_y)
+                            self.open_cell(neighbour_x, neighbour_y)
+            return True
+            
+
 
 
 if __name__ == '__main__':
