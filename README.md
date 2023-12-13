@@ -13,7 +13,21 @@ Install by pip:
 Random should come with Python.
 
 # Instructions
-Run the minesweeper.py file as a script.
+## How to run
+Run the minesweeper.py file as a script (by running from your code editor or running "python minesweeper.py" from your terminal.
+## How to play
+Hidden mines are scattered throughout a board, which is divided into cells or tiles. All tile is hidden initially.
+
+Each tile can be:
+ - A mine: you lose if you click on it
+ - A clue: number 1-8 indicating the number of mines diagonally or adjacent to it
+ - Blank: no mine around, all adjacent tiles will automatically be opened if you click on it
+
+You can:
+ - Left-click to open a tile. Use the clue to open every tile except for the mines to win
+ - Right-click to flag a tile to denote that you believe a mine to be in that place. A flagged tile is consider unopened and may be unflag by right-clicking again
+
+Left-click once after you win or lose to go to the end screen!
 
 # Future directions
 Adding user custom option for the map size and number of mines.
